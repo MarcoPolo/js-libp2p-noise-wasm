@@ -8,5 +8,5 @@ Allows you to do the crypto operations in WASM.
 # Building
 
 ```
-wasm-pack build --target nodejs --out-dir ./lib-wrapper/pkg_node
+wasm-pack build --target nodejs --out-dir ./node-noise-wasm
 ```
