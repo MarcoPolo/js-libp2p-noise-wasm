@@ -1,18 +1,11 @@
 use core::panic;
 use js_sys::{Array, Uint8Array};
-use rand_core::{CryptoRng, OsRng, RngCore};
 use snow::{
     resolvers::{CryptoResolver, DefaultResolver},
-    types::{Cipher, Dh, Random},
+    types::{Cipher, Dh},
 };
 use std::vec;
 use wasm_bindgen::prelude::*;
-
-macro_rules! console_log {
-    // Note that this is using the `log` function imported above during
-    // `bare_bones`
-    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
-}
 
 /* Needs to implement this interface:
 
@@ -183,49 +176,21 @@ impl CryptoInterfaceImpl {
     }
 }
 
+// Stock interop to console.log
 #[wasm_bindgen]
 extern "C" {
-    // Use `js_namespace` here to bind `console.log(..)` instead of just
-    // `log(..)`
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
 
-    // The `console.log` is quite polymorphic, so we can bind it with multiple
-    // signatures. Note that we need to use `js_name` to ensure we always call
-    // `log` in JS.
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log_u32(a: u32);
 
-    // Multiple arguments too!
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log_many(a: &str, b: &str);
 }
 
-struct MyRng(rand_core::block::BlockRng<rand_chacha::ChaCha8Core>);
-impl RngCore for MyRng {
-    fn next_u32(&mut self) -> u32 {
-        self.0.next_u32()
-    }
-
-    fn next_u64(&mut self) -> u64 {
-        self.0.next_u64()
-    }
-
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
-        self.0.fill_bytes(dest)
-    }
-
-    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), rand_core::Error> {
-        self.0.try_fill_bytes(dest)
-    }
-}
-impl CryptoRng for MyRng {}
-impl Random for MyRng {}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {}
+macro_rules! console_log {
+    // Note that this is using the `log` function imported above during
+    // `bare_bones`
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
